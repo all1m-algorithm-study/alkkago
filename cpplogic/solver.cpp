@@ -88,12 +88,12 @@ public:
 
         for (int i=0; i<SEARCH_CNT; i++) {
             float axis = (unit)i / SEARCH_CNT * 360;
-            auto[x,y] = physics::AngleToUnitVec(axis);
+            auto[x,y] = PHYSICS::UnitVector(axis);
 
             // 두 번의 binary search 를 통해 최적의 경우를 찾기
             result = MaxValNotCrossedOut(0, MAX_VEL);
-            unit max_val = physics::ABSVec(result.p.vel);
-            result = MinVeMaxPoint(0, max_val);
+            unit max_vel = result.p.vel.Norm();
+            result = MinVeMaxPoint(0, max_vel);
 
             // 갱신할 만하다고 생각되는 경우 답을 갱신
             if (answer.point < result.point) {

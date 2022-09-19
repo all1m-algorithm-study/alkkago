@@ -1,4 +1,4 @@
-#include "physics.cpp"
+#include "PHYSICS.cpp"
 
 
 
@@ -28,22 +28,37 @@ public:
     }
 
     void Run(state &answer) {
-        pieces curField(field); // 시뮬레이션에서 사용할 필드 상태
+        // 시뮬레이션에서 사용할 필드 상태
+        pieces curField(field);
+
+        // 만약 record 중이라면 기록
+        if (record) {
+            recorded_field.push_back(pieces(curField.begin(), curField.end()));
+        }
 
         /*
         충돌 위치까지의 거리가 가장 짧은 piece 의 번호를 얻음.
         이 물체와 충돌하는 것으로부터 시뮬레이션 시작
         */
-
         std::vector<unit> crush_dist(field.size(), 0);
         for (int i=1; i<field.size(); i++) {
-            crush_dist[i] = physics::GetCrushDist(curField[0], curField[i]);
+            crush_dist[i] = PHYSICS::FindCollisionDistance(curField[0], curField[i]);
         }
 
+        /*
+        만약 아무 피스와고도 충돌하지 않는다면 (거리가 INF) 시뮬레이션이 무의미함
+        outOfBounds 판정을 하고 시뮬레이션을 종료
+        */
         int crush_idx = min_element(crush_dist.begin(), crush_dist.end()) - crush_dist.begin();
-        physics::PutFirstCrush(curField[0], curField[crush_idx]);
+        if (crush_dist[crush_idx] == INF) {
+            answer.outOfBoudns = 1;
+            return;
+        }
 
-        // 만약 record 중이라면 기록
+        // 충돌 위치로 이동을 시킨 후 충돌 효과를 적용        
+        PHYSICS::Initialize(curField[0], crush_dist[crush_idx]);
+        PHYSICS::UpdateCollision(curField[0], curField[crush_idx]);
+
         if (record) {
             recorded_field.push_back(pieces(curField.begin(), curField.end()));
         }
@@ -57,7 +72,7 @@ public:
             */
 
             // 마찰에 의한 감속 적용하기
-            for (auto p: curField) physics::PutFricEffect(p);
+            for (auto p: curField) PHYSICS::UpdateMovement(p, PHYSICS::FRIC_ACCEL);
 
             // 모든 쌍에 대해 충돌 판정하기
             for (int i=0; i<field.size(); i++) {
@@ -65,9 +80,7 @@ public:
                     piece p1 = curField[i];
                     piece p2 = curField[j];
 
-                    if (physics::CheckCrush(p1, p2)) {
-                        physics::PutCrushEffect(p1, p2);
-                    }
+                    PHYSICS::UpdateCollision(p1, p2);
                 }
             }
 
