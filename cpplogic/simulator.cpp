@@ -55,7 +55,7 @@ public:
             return;
         }
 
-        // 충돌 위치로 이동을 시킨 후 충돌 효과를 적용        
+        // 충돌 위치로 이동을 시킨 후 충돌 효과를 적용
         PHYSICS::Initialize(curField[0], crush_dist[crush_idx]);
         PHYSICS::UpdateCollision(curField[0], curField[crush_idx]);
 
@@ -72,20 +72,17 @@ public:
             */
 
             // 마찰에 의한 감속 적용하기
-            for (auto p: curField) PHYSICS::UpdateMovement(p, PHYSICS::FRIC_ACCEL);
+            for (auto &p: curField) PHYSICS::UpdateMovement(p, TIME_UNIT);
 
             // 모든 쌍에 대해 충돌 판정하기
             for (int i=0; i<field.size(); i++) {
                 for (int j=i+1; j<field.size(); j++) {
-                    piece p1 = curField[i];
-                    piece p2 = curField[j];
-
-                    PHYSICS::UpdateCollision(p1, p2);
+                    PHYSICS::UpdateCollision(curField[i], curField[j]);
                 }
             }
 
             // 경계를 넘어간 말이 있는지 체크
-            for (auto p: curField) {
+            for (auto &p: curField) {
                 if (p.active == 1 && p.CheckOutOfBounds()) {
                     switch (p.type) {
                         case 0:
