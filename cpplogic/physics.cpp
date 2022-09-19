@@ -1,53 +1,88 @@
 #include "api.cpp"
 #include <cmath>
 
-namespace physics {
-    co AngleToUnitVec(unit angle); // 각도를 해당 단위벡터로 변환
-    unit ABSVec(co v); // 속도벡터의 절댓값
 
-    unit GetCrushDist(piece &p1, piece &p2); // 초기 충돌시 충돌 위치까지의 거리를 얻기
-    void PutFirstCrush(piece &object, piece &target); // 초기 충돌 이후 갱신
-    void PutFricEffect(piece &p); // 단위시간이 지난 후 속도 감소를 적용
-    bool CheckCrush(piece &p1, piece &p2); // 위치 이동 후 충돌했는지 판단
-    void PutCrushEffect(piece &p1, piece &p2); // 두 피스가 충돌한 후의 변화를 적용
+namespace PHYSICS {
+
+    // 마찰력에 의한 가속도 (수정 바람)
+    const unit FRIC_ACCEL = 0.55 * 9.8;
+
+    co UnitVector(unit angle);
+
+    // DeltaTime동안 변한 바둑돌의 상태를 최신화
+    void UpdateMovement(piece& source, unit DeltaTime); 
+
+    // 두 돌의 충돌에 의한 효과를 계산
+    void UpdateCollision(piece& source, piece& target);
+
+    // 두 돌이 충돌하는지 검사
+    bool CheckCollision(piece& source, piece& target);
+
+    // 시뮬레이션을 처음 시작할 경우에만 사용할 것, 최적해를 미리 찾을 때만 사용할 것.
+    // 참고 : 충돌할 수 있다고 하더라도 속력이 부족할 경우 충돌하지 않을 수 있다.
+    unit FindCollisionDistance(piece& White, piece& Black);
+
+    // 시간 변화를 검사하지 않고 DistanceMoved 거리만큼 이동할 경우 돌의 상태를 최신화한다. 충돌 계산은 없다.
+    void Initialize(piece& Black, unit DistanceMoved);
+
+};
 
 
+co PHYSICS::UnitVector(unit angle) {
+    return co( cos(angle * M_PI/180), sin(angle * M_PI/180) );
+}
 
-    unit ABSVec(co v) {
-        return sqrt(v.x * v.x + v.y * v.y);
+void PHYSICS::UpdateMovement(piece& source, unit DeltaTime) {
+
+    unit InitSpeed = source.vel.Norm();
+    unit FinalSpeed = InitSpeed - PHYSICS::FRIC_ACCEL * DeltaTime;
+
+    if ( FinalSpeed < 0 ) {
+        source.active = false;
+        FinalSpeed = 0;
     }
 
-    co AngleToUnitVec(unit angle) {
-        unit ux = cos(angle * M_PI / 180);
-        unit uy = sin(angle * M_PI / 180);
-        return {ux, uy};
-    }
+    source.SetVel( source.vel.UnitVector() * FinalSpeed );
 
-    unit GetCrushDist(piece &p1, piece &p2) {
-        unit r = sqrt((p1.loc.x - p2.loc.x) * (p1.loc.x - p2.loc.x) + (p1.loc.x - p2.loc.x) * (p1.loc.x - p2.loc.x));
-        unit r2_squre = RADIUS*2;
-        unit angle;
+    unit AverageSpeed = (InitSpeed + FinalSpeed)/2;
+    co DeltaLocation = source.vel.UnitVector() * (AverageSpeed * DeltaTime);
+    source.loc += DeltaLocation;
+}
 
-        // 두 변과 각도를 알 때 나머지 변 길이 구하기
-        return 0.0;
-    }
+void PHYSICS::UpdateCollision(piece& source, piece& target) {
+    if ( !CheckCollision(source, target)) return;
 
-    void PutFricEffect(piece &p) {
+    source.active = true;
+    target.active = true;
 
-    }
+    co r = (target.loc - source.loc).UnitVector();
+    co DeltaVelocity = r * ((source.vel - target.vel) * r);
 
-    void PutFirstCrush(piece &object, piece &target) {
-        // 최초 충돌 상황에서 속도가 어떻게 바뀌는지
-    }
+    source.vel -= DeltaVelocity;
+    target.vel += DeltaVelocity;
+}
 
-    bool CheckCrush(piece &p1, piece &p2) {
-        unit dist = (p1.loc.x - p2.loc.x) * (p1.loc.x - p2.loc.x) + (p1.loc.x - p2.loc.x) * (p1.loc.x - p2.loc.x);
-        unit radius = RADIUS * RADIUS * 4;
-        return (dist <= radius);
-    }
+bool PHYSICS::CheckCollision(piece& source, piece& target) {
+    return (source.loc - target.loc).Norm() < 2 * RADIUS;
+}
 
-    void PutCrushEffect(piece &p1, piece &p2) {
-        // 일반 충돌 상황에서 속도가 어떻게 바뀌는지
-    }
+unit PHYSICS::FindCollisionDistance(piece& White, piece& Black) {
 
+    const unit R = (White.loc - Black.loc).Norm();
+    const unit RCos = ((White.loc - Black.loc) * Black.vel) / Black.vel.Norm();
+
+    unit Determine = 4*RADIUS*RADIUS + RCos * RCos - R*R;
+    return ( Determine < 0 ) ? INF : (RCos - sqrt(Determine));
+}
+
+void PHYSICS::Initialize(piece& Black, unit DistanceMoved) {
+
+    unit Determine = Black.vel.Norm() * Black.vel.Norm() - 2 * PHYSICS::FRIC_ACCEL * DistanceMoved;
+    if ( Determine < 0 ) { Black.active = false; }
+
+    unit NewSpeed = ( Determine < 0 ) ? 0 : sqrt(Determine);
+    Black.SetVel(Black.vel.UnitVector() * NewSpeed);
+
+    co DeltaLocation = Black.vel.UnitVector() * DistanceMoved;
+    Black.SetLoc(Black.loc + DeltaLocation);
 }
