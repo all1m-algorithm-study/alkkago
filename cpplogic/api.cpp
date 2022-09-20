@@ -8,13 +8,13 @@ const unit RADIUS = 1; // 돌이 반지름
 const unit SIZE_H = 20; // 바둑판의 높이
 const unit SIZE_W = 20; // 바둑판의 너비
 
-const unit TIME_UNIT = 0.01; // 짧은 시간 간격
-const unit MIN_VELOCITY   = 0.01; // 실수 오차를 없앵기 위해 이 값 이하는 절사
-const unit MAX_VELOCITY   = 4; // 이분탐색시 적용할 최대 속도
-const unit FRICTION_CONST = 0.01; // 마찰력
+const unit TIME_UNIT = 1/64; // 짧은 시간 간격
+const unit MIN_VELOCITY   = 1/64; // 실수 오차를 없앵기 위해 이 값 이하는 절사
+const unit MAX_VELOCITY   = 16; // 이분탐색시 적용할 최대 속도
+const unit FRICTION_CONST = 1/64; // 마찰력
 
-const int SEARCH_CNT = 36; // 각도를 몇 개의 경우로 분해할 것인지
-const unit BS_INTERVAL = 0.01; // 실수 이분탐색을 몇 번 진행할 것인지
+const int SEARCH_CNT = 360; // 각도를 몇 개의 경우로 분해할 것인지
+const unit BS_INTERVAL = 1/64; // 실수 이분탐색을 몇 번 진행할 것인지
 
 
 const unit INF = 100'000.0f; // 적당히 매우 큰 값
@@ -44,6 +44,7 @@ struct co { // 벡터의 단위
 struct piece { // 바둑알 구조체
     int type; // black(0) or white(1)
     bool active = false;
+    bool dead = false;
 
     co vel{0,0}; // velocity of piece
     co loc{0,0}; // location of piece
