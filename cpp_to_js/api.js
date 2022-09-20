@@ -15,7 +15,7 @@ class co{// 벡터의 단위
     }
 
     Norm(){ return Math.sqrt(x*x + y*y); }
-    UnitVector(){ return co(x/this.Norm, y/this.Norm);}
+    UnitVector(){ return new co(x/this.Norm, y/this.Norm);}
 
     add(source){
         this.x += source.x;
@@ -35,18 +35,18 @@ class co{// 벡터의 단위
     }
 }
 
-function add(a, b){ return co(a.x + b.x, a.y + b.y); }
-function sub(a, b){ return co(a.x - b.x, a.y - b.y); }
-function mul(k, u){ return co(k*c.x, k*c.y); }
-function mul(a, b){ return (a.x*b.x + a.y*b.y); }
-function div(k, u){ return co(u.x/k, u.y/k); }
+function add(a, b){ return new co(a.x + b.x, a.y + b.y); }
+function sub(a, b){ return new co(a.x - b.x, a.y - b.y); }
+function mul(k, u){ return new co(k*u.x, k*u.y); }
+function prod(a, b){ return (a.x*b.x + a.y*b.y); } // dot product, 내적
+function div(k, u){ return new co(u.x/k, u.y/k); }
 
 class piece{// 바둑알 구조체
     constructor(type){// black(0) or white(1)
         this.type = type;
         this.active = false;
-        this.vel = co(0,0);// velocity of piece
-        this.loc = co(0,0); // location of piece
+        this.vel = new co(0,0);// velocity of piece
+        this.loc = new co(0,0); // location of piece
     }
     SetVel(vel){ this.vel = vel; }
     SetLoc(loc){ this.loc = loc; }
@@ -57,7 +57,7 @@ class piece{// 바둑알 구조체
 
 class state{
     constructor(){
-        this.p = piece(1);
+        this.p = new piece(1);
         this.point = 0; // 쓰러뜨린 백돌의 개수
         this.outOfBounds = false;// 흑돌이 밖으로 나갔는지 판별
     }
