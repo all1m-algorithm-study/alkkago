@@ -1,4 +1,5 @@
 #include <vector>
+#include <cmath>
 
 typedef long double unit; // 통일된 연산 단위
 
