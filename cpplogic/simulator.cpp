@@ -27,7 +27,7 @@ public:
         return !(0 <= p.loc.x && p.loc.x <= SIZE_W && 0 <= p.loc.y && p.loc.y <= SIZE_H);
     }
 
-    bool CheckAllInactive(pieces &ps) {
+    bool CheckAllInactive(pieces ps) {
         for (auto p: ps) if (p.active) return false;
         return true;
     }
@@ -94,13 +94,17 @@ public:
             // 모든 쌍에 대해 충돌 판정하기
             for (int i=0; i<field.size(); i++) {
                 for (int j=i+1; j<field.size(); j++) {
-                    PHYSICS::UpdateCollision(curField[i], curField[j]);
+                    piece &p1 = curField[i];
+                    piece &p2 = curField[j];
+                    if (p1.dead || p1.dead) continue;
+
+                    PHYSICS::UpdateCollision(p1, p2);
                 }
             }
 
             // 경계를 넘어간 말이 있는지 체크
             for (auto &p: curField) {
-                if (p.active == 1 && CheckOutOfBounds(p)) {
+                if (!p.dead && p.active && CheckOutOfBounds(p)) {
                     switch (p.type) {
                         case 0:
                             answer.point++;
@@ -109,6 +113,7 @@ public:
                             answer.outOfBoudns = true;
                             break;
                     }
+                    p.dead = true;
                     p.active = false;
                 }
             }
