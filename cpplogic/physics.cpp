@@ -81,9 +81,12 @@ unit PHYSICS::FindCollisionDistance(piece& Black, piece& White) {
 void PHYSICS::Initialize(piece& Black, unit DistanceMoved) {
 
     unit Determine = Black.vel.Norm() * Black.vel.Norm() - 2 * FRICTION_CONST * DistanceMoved;
-    if ( Determine < 0 ) { Black.active = false; }
+    if ( Determine < 0 || sqrt(Determine) < MIN_VELOCITY) {
+        Black.active = false;
+        return;
+    }
 
-    unit NewSpeed = ( Determine < MIN_VELOCITY ) ? 0 : sqrt(Determine);
+    unit NewSpeed = sqrt(Determine);
     Black.SetVel(Black.vel.UnitVector() * NewSpeed);
 
     co DeltaLocation = Black.vel.UnitVector() * DistanceMoved;
