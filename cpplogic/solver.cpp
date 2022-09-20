@@ -32,7 +32,7 @@ public:
         unit x, y;
         std::cin >> x >> y;
 
-        piece p(1);
+        piece p(0);
         p.loc = {x,y};
 
         AddPiece(p);
@@ -69,24 +69,31 @@ public:
         while (high - low > BS_INTERVAL) {
             unit mid = (high + low) / 2;
             state candidate;
-            piece p = object;
-            p.vel = unitVec * mid;
+            candidate.p = object;
+            candidate.p.vel = unitVec * mid;
 
-            Sim.UpdatePieceState(p);
-            Sim.Run(result);
+            Sim.UpdatePieceState(candidate.p);
+            Sim.Run(candidate);
 
-            if (result.outOfBoudns == true) {
+            if (candidate.foul == true) {
+                return candidate;
+            }
+
+            if (candidate.outOfBoudns == true) {
                 high = mid;
             } else {
                 low = mid;
-                result = candidate;
+
+                if (result.point < candidate.point) {
+                    result = candidate;
+                }
             }
         }
 
         return result;
     };
 
-    state MinVeMaxPoint(unit low, unit high, co unitVec, int point) {
+    state MinVelMaxPoint(unit low, unit high, co unitVec, int point) {
         //밖으로 안빠지며 포인트가 최대인 경우중 속도가 최소를 찾는 이분탐색 구현
         state result;
 
@@ -98,9 +105,6 @@ public:
 
             Sim.UpdatePieceState(p);
             Sim.Run(result);
-
-            assert(!result.outOfBoudns);
-            assert(result.point <= point);
 
             if (result.point == point) {
                 high = mid;
@@ -121,16 +125,20 @@ public:
         state result;
 
         for (int i=0; i<SEARCH_CNT; i++) {
-            unit axis = (unit)i / SEARCH_CNT * 360;
+            unit axis = i * (360 / SEARCH_CNT);
             co unitVec = PHYSICS::UnitVector(axis);
 
             // 두 번의 binary search 를 통해 최적의 경우를 찾기
             result = MaxValNotCrossedOut(MIN_VELOCITY, MAX_VELOCITY, unitVec);
-            unit max_vel = result.p.vel.Norm();
-            result = MinVeMaxPoint(MIN_VELOCITY, max_vel, unitVec, result.point);
-        }
+            if (result.outOfBoudns) continue;
 
-        answer = result;
+            if (result.point > answer.point) {
+                answer = result;
+            }
+
+            //unit max_vel = result.p.vel.Norm();
+            //result = MinVelMaxPoint(MIN_VELOCITY, max_vel, unitVec, result.point);
+        }
     };
 };
 

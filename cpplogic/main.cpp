@@ -5,7 +5,7 @@
 int main() {
     Solver solver;
 
-    int B = 1, W; // 백, 흑돌의 개수
+    int B = 1, W;
     std::cin >> W;
 
     for (int i=0; i<B; i++) solver.ScanBlackPiece();
@@ -13,6 +13,5 @@ int main() {
 
     solver.FindOptimal();
     solver.PrintAnswer();
-    //solver.PrintAnswerStep();
 };
 

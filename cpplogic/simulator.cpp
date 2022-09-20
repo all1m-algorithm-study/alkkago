@@ -64,19 +64,18 @@ public:
         */
         int crush_idx = min_element(crush_dist.begin()+1, crush_dist.end()) - crush_dist.begin();
         if (crush_dist[crush_idx] == INF) {
-            answer.outOfBoudns = 1;
+            answer.outOfBoudns = true;
+            answer.foul = true;
             return;
         }
-        std::cout << crush_dist[crush_idx] << std::endl;
 
-        PrintPiece(curField[0]);
+        std::cout << crush_dist[crush_idx] << std::endl;
 
         // 충돌 위치로 이동을 시킨 후 충돌 효과를 적용
         PHYSICS::Initialize(curField[0], crush_dist[crush_idx]);
-        PrintPiece(curField[0]);
 
         PHYSICS::UpdateCollision(curField[0], curField[crush_idx]);
-        PrintPiece(curField[0]);
+        PrintPiece(curField[1]);
 
         if (record) {
             recorded_field.push_back(pieces(curField.begin(), curField.end()));

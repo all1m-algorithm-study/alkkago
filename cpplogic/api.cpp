@@ -9,9 +9,9 @@ const unit SIZE_H = 20; // 바둑판의 높이
 const unit SIZE_W = 20; // 바둑판의 너비
 
 const unit TIME_UNIT = 0.01; // 짧은 시간 간격
-const unit MIN_VELOCITY   = 1/64; // 실수 오차를 없앵기 위해 이 값 이하는 절사
+const unit MIN_VELOCITY   = 0.01; // 실수 오차를 없앵기 위해 이 값 이하는 절사
 const unit MAX_VELOCITY   = 4; // 이분탐색시 적용할 최대 속도
-const unit FRICTION_CONST = 0.1; // 마찰력
+const unit FRICTION_CONST = 0.01; // 마찰력
 
 const int SEARCH_CNT = 36; // 각도를 몇 개의 경우로 분해할 것인지
 const unit BS_INTERVAL = 0.01; // 실수 이분탐색을 몇 번 진행할 것인지
@@ -74,4 +74,5 @@ struct state {
     piece p{1};
     int point = 0; // 쓰러뜨린 백돌의 개수
     bool outOfBoudns = false; // 흑돌이 밖으로 나갔는지 판별
+    bool foul = false; // 흑돌이 백돌을 저격하지 못하고 떨어지는 경우
 };
