@@ -10,7 +10,8 @@ const unit TIME_UNIT = 0.001; // 짧은 시간 간격
 const unit MAX_VEL   = 1; // 이분탐색시 적용할 최대 속도
 
 const int SEARCH_CNT = 36; // 각도를 몇 개의 경우로 분해할 것인지
-const int BS_CNT = 10; // 실수 이분탐색을 몇 번 진행할 것인지 
+const int BS_INTERVAL = 0.01; // 실수 이분탐색을 몇 번 진행할 것인지
+
 
 const unit INF = 100'000.0f; // 적당히 매우 큰 값
 
@@ -21,7 +22,7 @@ struct co { // 벡터의 단위
     co(unit _x=0, unit _y=0) : x(_x), y(_y) {}
 
     unit Norm() { return sqrt(x*x + y*y); }
-    co UnitVector() { return co(x/Norm(), y/Norm()); }
+    co UnitVector() { return co(x,y)/Norm(); }
 
     co operator+(co& source)   { return co(source.x + x, source.y + y); }
     co operator-(co& source)   { return co(source.x + x, source.y + y); }

@@ -1,5 +1,6 @@
 #include "simulator.cpp"
 #include <iostream>
+#include <cassert>
 
 class Solver {
 
@@ -55,26 +56,57 @@ public:
     실수 이분탐색을 잘 구현해야 하며 BS_CNT 만큼 반복
     */
 
-    state MaxValNotCrossedOut(unit low, unit high) {
-        //밖으로 빠지지 않는 경우중 속도가 최대인 경우를 찾는 이분탐색 구현
+    state MaxValNotCrossedOut(unit low, unit high, co unitVec) {
+        /*
+        밖으로 빠지지 않는 경우중 속도가 최대인 경우를 찾는 이분탐색 구현
+        유효 오차가 특정 간격 이하가 될 때까지 반복
+        */
 
         state result;
-        piece p = object;
-        p.vel = {0,0}; // 이분탐색을 통해 결정된 v 값을 입력
-        Sim.PutPieceState(p);
-        Sim.Run(result);
+
+        while (high - low > BS_INTERVAL) {
+            unit mid = (high + low) / 2;
+            state candidate;
+            piece p = object;
+            p.vel = unitVec * mid;
+
+            Sim.PutPieceState(p);
+            Sim.Run(result);
+
+            if (result.outOfBoudns == true) {
+                high = mid;
+            } else {
+                low = mid;
+                result = candidate;
+            }
+        }
 
         return result;
     };
 
-    state MinVeMaxPoint(unit low, unit high) {
+    state MinVeMaxPoint(unit low, unit high, co unitVec, int point) {
         //밖으로 안빠지며 포인트가 최대인 경우중 속도가 최소를 찾는 이분탐색 구현
-
         state result;
-        piece p = object;
-        p.vel = {0,0}; // 이분탐색을 통해 결정된 v 값을 입력
-        Sim.PutPieceState(p);
-        Sim.Run(result);
+
+        while (high - low > BS_INTERVAL) {
+            unit mid = (high + low) / 2;
+            state candidate;
+            piece p = object;
+            p.vel = unitVec * mid;
+
+            Sim.PutPieceState(p);
+            Sim.Run(result);
+
+            assert(!result.outOfBoudns);
+            assert(result.point <= point);
+
+            if (result.point == point) {
+                high = mid;
+                result = candidate;
+            } else {
+                low = mid;
+            }
+        }
 
         return result;
     }
@@ -88,18 +120,15 @@ public:
 
         for (int i=0; i<SEARCH_CNT; i++) {
             float axis = (unit)i / SEARCH_CNT * 360;
-            auto[x,y] = PHYSICS::UnitVector(axis);
+            co unitVec = PHYSICS::UnitVector(axis);
 
             // 두 번의 binary search 를 통해 최적의 경우를 찾기
-            result = MaxValNotCrossedOut(0, MAX_VEL);
+            result = MaxValNotCrossedOut(0, MAX_VEL, unitVec);
             unit max_vel = result.p.vel.Norm();
-            result = MinVeMaxPoint(0, max_vel);
-
-            // 갱신할 만하다고 생각되는 경우 답을 갱신
-            if (answer.point < result.point) {
-                answer = result;
-            }
+            result = MinVeMaxPoint(0, max_vel, unitVec, result.point);
         }
+
+        answer = result;
     };
 };
 
