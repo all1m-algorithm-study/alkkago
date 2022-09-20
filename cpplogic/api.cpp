@@ -24,7 +24,7 @@ struct co { // 벡터의 단위
     co UnitVector() { return co(x/Norm(), y/Norm()); }
 
     co operator+(co& source)   { return co(source.x + x, source.y + y); }
-    co operator-(co& source)   { return co(source.x + x, source.y + y); }
+    co operator-(co& source)   { return co(source.x - x, source.y - y); }
     co operator*(unit Scalar)  { return co(x * Scalar, y * Scalar); }
     unit operator*(co& source) { return x * source.x + y * source.y; }
     co operator/(unit Scalar)  { return co(x / Scalar, y / Scalar); }
