@@ -1,14 +1,14 @@
-RADIUS = 1;
-SIZE_H = 20;
-SIZE_W = 20;
+RADIUS = 1; // 돌의 반지름
+SIZE_H = 20;// 바둑판의 높이
+SIZE_W = 20;// 바둑판의 너비
 
-TIME_UNIT = 0.001;
-MAX_VEL = 1;
-SEARCH_CNT = 36;
-BS_CNT = 10;
-INF = 100000;
+TIME_UNIT = 0.001;// 짧은 시간 간격
+MAX_VEL = 1;// 이분탐색시 적용할 최대 속도
+SEARCH_CNT = 36; // 각도를 몇 개의 경우로 분해할 것인지
+BS_CNT = 10;// 실수 이분탐색을 몇 번 진행할 것인지 
+INF = 100000;// 적당히 매우 큰 값
 
-class co{
+class co{// 벡터의 단위
     constructor(x,y){
         this.x = x;
         this.y = y;
@@ -41,12 +41,12 @@ function mul(k, u){ return co(k*c.x, k*c.y); }
 function mul(a, b){ return (a.x*b.x + a.y*b.y); }
 function div(k, u){ return co(u.x/k, u.y/k); }
 
-class piece{
-    constructor(type){
+class piece{// 바둑알 구조체
+    constructor(type){// black(0) or white(1)
         this.type = type;
         this.active = false;
-        this.vel = co(0,0);
-        this.loc = co(0,0);
+        this.vel = co(0,0);// velocity of piece
+        this.loc = co(0,0); // location of piece
     }
     SetVel(vel){ this.vel = vel; }
     SetLoc(loc){ this.loc = loc; }
@@ -58,7 +58,7 @@ class piece{
 class state{
     constructor(){
         this.p = piece(1);
-        this.point = 0;
-        this.outOfBounds = false;
+        this.point = 0; // 쓰러뜨린 백돌의 개수
+        this.outOfBounds = false;// 흑돌이 밖으로 나갔는지 판별
     }
 }
