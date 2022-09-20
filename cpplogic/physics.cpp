@@ -5,7 +5,6 @@
 namespace PHYSICS {
 
     // 마찰력에 의한 가속도 (수정 바람)
-    const unit FRIC_ACCEL = 0.55 * 9.8;
 
     co UnitVector(unit angle);
 
@@ -20,7 +19,7 @@ namespace PHYSICS {
 
     // 시뮬레이션을 처음 시작할 경우에만 사용할 것, 최적해를 미리 찾을 때만 사용할 것.
     // 참고 : 충돌할 수 있다고 하더라도 속력이 부족할 경우 충돌하지 않을 수 있다.
-    unit FindCollisionDistance(piece& White, piece& Black);
+    unit FindCollisionDistance(piece& Black, piece& White);
 
     // 시간 변화를 검사하지 않고 DistanceMoved 거리만큼 이동할 경우 돌의 상태를 최신화한다. 충돌 계산은 없다.
     void Initialize(piece& Black, unit DistanceMoved);
@@ -33,9 +32,10 @@ co PHYSICS::UnitVector(unit angle) {
 }
 
 void PHYSICS::UpdateMovement(piece& source, unit DeltaTime) {
+    if ( !source.active) return;
 
     unit InitSpeed = source.vel.Norm();
-    unit FinalSpeed = InitSpeed - PHYSICS::FRIC_ACCEL * DeltaTime;
+    unit FinalSpeed = InitSpeed - FRICTION_CONST * DeltaTime;
 
     if ( FinalSpeed < 0 ) {
         source.active = false;
@@ -46,7 +46,11 @@ void PHYSICS::UpdateMovement(piece& source, unit DeltaTime) {
 
     unit AverageSpeed = (InitSpeed + FinalSpeed)/2;
     co DeltaLocation = source.vel.UnitVector() * (AverageSpeed * DeltaTime);
+    std::cout << DeltaLocation.x <<' '<< DeltaLocation.y << std::endl;
+    //source.loc = source.loc + DeltaLocation;
     source.loc += DeltaLocation;
+    std::cout << source.loc.x <<' '<< source.loc.y << std::endl;
+
 }
 
 void PHYSICS::UpdateCollision(piece& source, piece& target) {
@@ -66,7 +70,7 @@ bool PHYSICS::CheckCollision(piece& source, piece& target) {
     return (source.loc - target.loc).Norm() < 2 * RADIUS;
 }
 
-unit PHYSICS::FindCollisionDistance(piece& White, piece& Black) {
+unit PHYSICS::FindCollisionDistance(piece& Black, piece& White) {
 
     const unit R = (White.loc - Black.loc).Norm();
     const unit RCos = ((White.loc - Black.loc) * Black.vel) / Black.vel.Norm();
@@ -77,8 +81,8 @@ unit PHYSICS::FindCollisionDistance(piece& White, piece& Black) {
 
 void PHYSICS::Initialize(piece& Black, unit DistanceMoved) {
 
-    unit Determine = Black.vel.Norm() * Black.vel.Norm() - 2 * PHYSICS::FRIC_ACCEL * DistanceMoved;
-    if ( Determine < 0 ) { Black.active = false; }
+    unit Determine = Black.vel.Norm() * Black.vel.Norm() - 2 * FRICTION_CONST * DistanceMoved;
+    //if ( Determine < 0 ) { Black.active = false; }
 
     unit NewSpeed = ( Determine < 0 ) ? 0 : sqrt(Determine);
     Black.SetVel(Black.vel.UnitVector() * NewSpeed);

@@ -1,5 +1,6 @@
-#include "PHYSICS.cpp"
-
+#include "physics.cpp"
+#include <iostream>
+#include <cassert>
 
 
 class Simulator {
@@ -15,7 +16,7 @@ public:
         field.push_back(p);
     };
 
-    void PutPieceState(piece &p) {
+    void UpdatePieceState(piece &p) {
         /*
         단순화를 위해 field[0] 이 black piece 이며 input 도 이 순서로 받음
         */
@@ -27,14 +28,35 @@ public:
         return true;
     }
 
+    void PrintPiece(piece p) {
+        std::cout << "piece color: " << p.type << std::endl;
+        std::cout << "piece loc: " << p.loc.x <<' '<< p.loc.y << std::endl; 
+        std::cout << "piece vel: " << p.vel.x <<' '<< p.vel.y << std::endl;
+        std::cout << std::endl;
+    }
+
+    void PrintField(pieces f) {
+        for (auto p: f) PrintPiece(p);
+    }
+
     void Run(state &answer) {
         // 시뮬레이션에서 사용할 필드 상태
         pieces curField(field);
+        curField[0].active = true;
+        std::cout << field[0].vel.x <<' '<< field[0].vel.y << std::endl;
+
+        PHYSICS::UpdateMovement(curField[0], TIME_UNIT);
+        PrintPiece(curField[0]);
+        PHYSICS::UpdateMovement(curField[0], TIME_UNIT);
+        PrintPiece(curField[0]);
+        PHYSICS::UpdateMovement(curField[0], TIME_UNIT);
+        PrintPiece(curField[0]);
 
         // 만약 record 중이라면 기록
         if (record) {
             recorded_field.push_back(pieces(curField.begin(), curField.end()));
         }
+        std::cout << curField[0].active << std::endl;
 
         /*
         충돌 위치까지의 거리가 가장 짧은 piece 의 번호를 얻음.
@@ -52,16 +74,24 @@ public:
         int crush_idx = min_element(crush_dist.begin(), crush_dist.end()) - crush_dist.begin();
         if (crush_dist[crush_idx] == INF) {
             answer.outOfBoudns = 1;
+            std:: cout << "outOfBounds" << std::endl;
             return;
         }
+        std::cout << curField[0].active << " " << curField[crush_idx].active << std::endl;
+
 
         // 충돌 위치로 이동을 시킨 후 충돌 효과를 적용
         PHYSICS::Initialize(curField[0], crush_dist[crush_idx]);
+        std::cout << curField[0].active << " " << curField[crush_idx].active << std::endl;
+
         PHYSICS::UpdateCollision(curField[0], curField[crush_idx]);
+        std::cout << curField[0].active << " " << curField[crush_idx].active << std::endl;
 
         if (record) {
             recorded_field.push_back(pieces(curField.begin(), curField.end()));
         }
+
+        assert(false);
 
 
 
@@ -73,6 +103,8 @@ public:
 
             // 마찰에 의한 감속 적용하기
             for (auto &p: curField) PHYSICS::UpdateMovement(p, TIME_UNIT);
+
+            //PrintField(curField);
 
             // 모든 쌍에 대해 충돌 판정하기
             for (int i=0; i<field.size(); i++) {

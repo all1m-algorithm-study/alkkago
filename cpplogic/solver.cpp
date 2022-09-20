@@ -39,11 +39,13 @@ public:
     };
 
     void PrintAnswer() {
-        // c++ 에서는 테스트 출력
+        std::cout << "point: " << answer.point << std::endl;
+        std::cout << "outOfBounds: " << answer.outOfBoudns << std::endl;
+        std::cout << "vector: " << answer.p.vel.x <<' '<< answer.p.vel.y << std::endl;
     };
 
     void PrintAnswerStep() {
-        Sim.PutPieceState(answer.p);
+        Sim.UpdatePieceState(answer.p);
         Sim.RunWithStep(answer, answer_with_steps);
     };
 
@@ -70,7 +72,7 @@ public:
             piece p = object;
             p.vel = unitVec * mid;
 
-            Sim.PutPieceState(p);
+            Sim.UpdatePieceState(p);
             Sim.Run(result);
 
             if (result.outOfBoudns == true) {
@@ -94,7 +96,7 @@ public:
             piece p = object;
             p.vel = unitVec * mid;
 
-            Sim.PutPieceState(p);
+            Sim.UpdatePieceState(p);
             Sim.Run(result);
 
             assert(!result.outOfBoudns);
@@ -119,13 +121,13 @@ public:
         state result;
 
         for (int i=0; i<SEARCH_CNT; i++) {
-            float axis = (unit)i / SEARCH_CNT * 360;
+            unit axis = (unit)i / SEARCH_CNT * 360;
             co unitVec = PHYSICS::UnitVector(axis);
 
             // 두 번의 binary search 를 통해 최적의 경우를 찾기
-            result = MaxValNotCrossedOut(0, MAX_VEL, unitVec);
+            result = MaxValNotCrossedOut(MIN_VEL, MAX_VEL, unitVec);
             unit max_vel = result.p.vel.Norm();
-            result = MinVeMaxPoint(0, max_vel, unitVec, result.point);
+            result = MinVeMaxPoint(MIN_VEL, max_vel, unitVec, result.point);
         }
 
         answer = result;
