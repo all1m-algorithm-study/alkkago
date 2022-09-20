@@ -125,9 +125,9 @@ public:
             co unitVec = PHYSICS::UnitVector(axis);
 
             // 두 번의 binary search 를 통해 최적의 경우를 찾기
-            result = MaxValNotCrossedOut(MIN_VEL, MAX_VEL, unitVec);
+            result = MaxValNotCrossedOut(MIN_VELOCITY, MAX_VELOCITY, unitVec);
             unit max_vel = result.p.vel.Norm();
-            result = MinVeMaxPoint(MIN_VEL, max_vel, unitVec, result.point);
+            result = MinVeMaxPoint(MIN_VELOCITY, max_vel, unitVec, result.point);
         }
 
         answer = result;

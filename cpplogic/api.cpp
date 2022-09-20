@@ -9,8 +9,8 @@ const unit SIZE_H = 20; // 바둑판의 높이
 const unit SIZE_W = 20; // 바둑판의 너비
 
 const unit TIME_UNIT = 0.01; // 짧은 시간 간격
-const unit MIN_VEL   = 0.01; // 이분탐색시 적용할 최소 속도
-const unit MAX_VEL   = 1; // 이분탐색시 적용할 최대 속도
+const unit MIN_VELOCITY   = 1/64; // 실수 오차를 없앵기 위해 이 값 이하는 절사
+const unit MAX_VELOCITY   = 4; // 이분탐색시 적용할 최대 속도
 const unit FRICTION_CONST = 0.1; // 마찰력
 
 const int SEARCH_CNT = 36; // 각도를 몇 개의 경우로 분해할 것인지
@@ -29,15 +29,15 @@ struct co { // 벡터의 단위
     co UnitVector() { return co(x,y)/Norm(); }
 
     co operator+(co& source)   { return co(source.x + x, source.y + y); }
-    co operator-(co& source)   { return co(source.x - x, source.y - y); }
+    co operator-(co& source)   { return co(x - source.x, y - source.y); }
     co operator*(unit Scalar)  { return co(x * Scalar, y * Scalar); }
     unit operator*(co& source) { return x * source.x + y * source.y; }
     co operator/(unit Scalar)  { return co(x / Scalar, y / Scalar); }
 
-    co operator+=(co& source)  { return *this + source; }
-    co operator-=(co& source)  { return *this - source; }
-    co operator*=(unit Scalar) { return *this * Scalar; }
-    co operator/=(unit Scalar) { return *this / Scalar; }
+    void operator+=(co& source)  { *this = *this + source; }
+    void operator-=(co& source)  { *this = *this - source; }
+    void operator*=(unit Scalar) { *this = *this * Scalar; }
+    void operator/=(unit Scalar) { *this = *this / Scalar; }
 };
 
 
@@ -50,18 +50,16 @@ struct piece { // 바둑알 구조체
 
     piece(int _type) :type(_type) {};
 
-    void SetVel(co vel) {
-        vel = vel;
+    void SetVel(co _vel) {
+        vel = _vel;
     }
 
-    void SetLoc(co loc) {
-        loc = loc;
+    void SetLoc(co _loc) {
+        loc = _loc;
     }
 
     bool CheckOutOfBounds() {
-        bool f = (!(0 <= loc.x && loc.x <= SIZE_W && 0 <= loc.y && loc.y <= SIZE_H));
-        if (f) std::cout << "outofbounds" << std::endl;
-        return f;
+        return !(0 <= loc.x && loc.x <= SIZE_W && 0 <= loc.y && loc.y <= SIZE_H);
     }
 };
 

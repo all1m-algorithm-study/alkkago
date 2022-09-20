@@ -3,13 +3,6 @@
 
 
 int main() {
-
-    co a = {1,2};
-    co b = {3,4};
-    a *= 3;
-    std::cout << a.x <<' '<< a.y << std::endl;
-
-
     Solver solver;
 
     int B = 1, W; // 백, 흑돌의 개수

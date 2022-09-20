@@ -43,20 +43,11 @@ public:
         // 시뮬레이션에서 사용할 필드 상태
         pieces curField(field);
         curField[0].active = true;
-        std::cout << field[0].vel.x <<' '<< field[0].vel.y << std::endl;
-
-        PHYSICS::UpdateMovement(curField[0], TIME_UNIT);
-        PrintPiece(curField[0]);
-        PHYSICS::UpdateMovement(curField[0], TIME_UNIT);
-        PrintPiece(curField[0]);
-        PHYSICS::UpdateMovement(curField[0], TIME_UNIT);
-        PrintPiece(curField[0]);
 
         // 만약 record 중이라면 기록
         if (record) {
             recorded_field.push_back(pieces(curField.begin(), curField.end()));
         }
-        std::cout << curField[0].active << std::endl;
 
         /*
         충돌 위치까지의 거리가 가장 짧은 piece 의 번호를 얻음.
@@ -71,28 +62,25 @@ public:
         만약 아무 피스와고도 충돌하지 않는다면 (거리가 INF) 시뮬레이션이 무의미함
         outOfBounds 판정을 하고 시뮬레이션을 종료
         */
-        int crush_idx = min_element(crush_dist.begin(), crush_dist.end()) - crush_dist.begin();
+        int crush_idx = min_element(crush_dist.begin()+1, crush_dist.end()) - crush_dist.begin();
         if (crush_dist[crush_idx] == INF) {
             answer.outOfBoudns = 1;
-            std:: cout << "outOfBounds" << std::endl;
             return;
         }
-        std::cout << curField[0].active << " " << curField[crush_idx].active << std::endl;
+        std::cout << crush_dist[crush_idx] << std::endl;
 
+        PrintPiece(curField[0]);
 
         // 충돌 위치로 이동을 시킨 후 충돌 효과를 적용
         PHYSICS::Initialize(curField[0], crush_dist[crush_idx]);
-        std::cout << curField[0].active << " " << curField[crush_idx].active << std::endl;
+        PrintPiece(curField[0]);
 
         PHYSICS::UpdateCollision(curField[0], curField[crush_idx]);
-        std::cout << curField[0].active << " " << curField[crush_idx].active << std::endl;
+        PrintPiece(curField[0]);
 
         if (record) {
             recorded_field.push_back(pieces(curField.begin(), curField.end()));
         }
-
-        assert(false);
-
 
 
         while (!CheckAllInactive(curField)) {

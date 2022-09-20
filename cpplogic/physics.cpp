@@ -37,7 +37,7 @@ void PHYSICS::UpdateMovement(piece& source, unit DeltaTime) {
     unit InitSpeed = source.vel.Norm();
     unit FinalSpeed = InitSpeed - FRICTION_CONST * DeltaTime;
 
-    if ( FinalSpeed < 0 ) {
+    if ( FinalSpeed < MIN_VELOCITY ) {
         source.active = false;
         FinalSpeed = 0;
     }
@@ -46,11 +46,7 @@ void PHYSICS::UpdateMovement(piece& source, unit DeltaTime) {
 
     unit AverageSpeed = (InitSpeed + FinalSpeed)/2;
     co DeltaLocation = source.vel.UnitVector() * (AverageSpeed * DeltaTime);
-    std::cout << DeltaLocation.x <<' '<< DeltaLocation.y << std::endl;
-    //source.loc = source.loc + DeltaLocation;
     source.loc += DeltaLocation;
-    std::cout << source.loc.x <<' '<< source.loc.y << std::endl;
-
 }
 
 void PHYSICS::UpdateCollision(piece& source, piece& target) {
@@ -74,6 +70,9 @@ unit PHYSICS::FindCollisionDistance(piece& Black, piece& White) {
 
     const unit R = (White.loc - Black.loc).Norm();
     const unit RCos = ((White.loc - Black.loc) * Black.vel) / Black.vel.Norm();
+    const unit RCosx = sqrt(R*R - 4*RADIUS*RADIUS);
+
+    if (RCos < RCosx) return INF;
 
     unit Determine = 4*RADIUS*RADIUS + RCos * RCos - R*R;
     return ( Determine < 0 ) ? INF : (RCos - sqrt(Determine));
@@ -82,9 +81,9 @@ unit PHYSICS::FindCollisionDistance(piece& Black, piece& White) {
 void PHYSICS::Initialize(piece& Black, unit DistanceMoved) {
 
     unit Determine = Black.vel.Norm() * Black.vel.Norm() - 2 * FRICTION_CONST * DistanceMoved;
-    //if ( Determine < 0 ) { Black.active = false; }
+    if ( Determine < 0 ) { Black.active = false; }
 
-    unit NewSpeed = ( Determine < 0 ) ? 0 : sqrt(Determine);
+    unit NewSpeed = ( Determine < MIN_VELOCITY ) ? 0 : sqrt(Determine);
     Black.SetVel(Black.vel.UnitVector() * NewSpeed);
 
     co DeltaLocation = Black.vel.UnitVector() * DistanceMoved;
