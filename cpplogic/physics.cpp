@@ -90,6 +90,5 @@ void PHYSICS::Initialize(piece& Black, unit DistanceMoved) {
     Black.SetVel(Black.vel.UnitVector() * NewSpeed);
 
     co DeltaLocation = Black.vel.UnitVector() * DistanceMoved;
-    std::cout << DeltaLocation.x <<' '<< DeltaLocation.y << std::endl;
     Black.SetLoc(Black.loc + DeltaLocation);
 }

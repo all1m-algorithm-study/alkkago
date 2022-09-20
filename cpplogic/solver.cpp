@@ -40,8 +40,8 @@ public:
 
     void PrintAnswer() {
         std::cout << "point: " << answer.point << std::endl;
-        std::cout << "outOfBounds: " << answer.outOfBoudns << std::endl;
-        std::cout << "vector: " << answer.p.vel.x <<' '<< answer.p.vel.y << std::endl;
+        std::cout << "direction: " << std::endl << "x: " << answer.p.vel.x << ", y: " << answer.p.vel.y << std::endl;
+        std::cout << "outOfBounds: " << ((answer.outOfBoudns) ? "true" : "false")  << std::endl;
     };
 
     void PrintAnswerStep() {
@@ -61,7 +61,6 @@ public:
     state MaxValNotCrossedOut(unit low, unit high, co unitVec) {
         /*
         밖으로 빠지지 않는 경우중 속도가 최대인 경우를 찾는 이분탐색 구현
-        유효 오차가 특정 간격 이하가 될 때까지 반복
         */
 
         state result;
@@ -75,6 +74,7 @@ public:
             Sim.UpdatePieceState(candidate.p);
             Sim.Run(candidate);
 
+            // 발사 방향에 충돌 가능성이 있는 물체가 없는 경우 바로 종료
             if (candidate.foul == true) {
                 return candidate;
             }
@@ -93,30 +93,6 @@ public:
         return result;
     };
 
-    state MinVelMaxPoint(unit low, unit high, co unitVec, int point) {
-        //밖으로 안빠지며 포인트가 최대인 경우중 속도가 최소를 찾는 이분탐색 구현
-        state result;
-
-        while (high - low > BS_INTERVAL) {
-            unit mid = (high + low) / 2;
-            state candidate;
-            piece p = object;
-            p.vel = unitVec * mid;
-
-            Sim.UpdatePieceState(p);
-            Sim.Run(result);
-
-            if (result.point == point) {
-                high = mid;
-                result = candidate;
-            } else {
-                low = mid;
-            }
-        }
-
-        return result;
-    }
-
     void FindOptimal() {
         /*
         각도 브루트포스, 이분 탐색을 통해 최적을 찾아
@@ -128,16 +104,15 @@ public:
             unit axis = i * (360 / SEARCH_CNT);
             co unitVec = PHYSICS::UnitVector(axis);
 
-            // 두 번의 binary search 를 통해 최적의 경우를 찾기
+            // binary search 를 통해 최적의 경우를 찾기
             result = MaxValNotCrossedOut(MIN_VELOCITY, MAX_VELOCITY, unitVec);
+
+            // 최적인 결과조차 outOfBounded 라면 고려할 필요가 없음
             if (result.outOfBoudns) continue;
 
             if (result.point > answer.point) {
                 answer = result;
             }
-
-            //unit max_vel = result.p.vel.Norm();
-            //result = MinVelMaxPoint(MIN_VELOCITY, max_vel, unitVec, result.point);
         }
     };
 };

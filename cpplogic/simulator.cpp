@@ -8,7 +8,7 @@ class Simulator {
 private:
     pieces field;
 
-    bool record = 0;
+    bool record = false;
     steps recorded_field;
 
 public:
@@ -21,6 +21,10 @@ public:
         단순화를 위해 field[0] 이 black piece 이며 input 도 이 순서로 받음
         */
         field[0] = p;
+    }
+
+    bool CheckOutOfBounds(piece p) {
+        return !(0 <= p.loc.x && p.loc.x <= SIZE_W && 0 <= p.loc.y && p.loc.y <= SIZE_H);
     }
 
     bool CheckAllInactive(pieces &ps) {
@@ -40,7 +44,8 @@ public:
     }
 
     void Run(state &answer) {
-        // 시뮬레이션에서 사용할 필드 상태
+
+        // 시뮬레이션에서 사용할 필드를 초기화
         pieces curField(field);
         curField[0].active = true;
 
@@ -59,8 +64,8 @@ public:
         }
 
         /*
-        만약 아무 피스와고도 충돌하지 않는다면 (거리가 INF) 시뮬레이션이 무의미함
-        outOfBounds 판정을 하고 시뮬레이션을 종료
+        만약 아무 피스와도 충돌하지 않는다면 (거리가 INF) 시뮬레이션이 무의미함
+        foul 판정을 하고 시뮬레이션을 종료
         */
         int crush_idx = min_element(crush_dist.begin()+1, crush_dist.end()) - crush_dist.begin();
         if (crush_dist[crush_idx] == INF) {
@@ -69,18 +74,13 @@ public:
             return;
         }
 
-        std::cout << crush_dist[crush_idx] << std::endl;
-
         // 충돌 위치로 이동을 시킨 후 충돌 효과를 적용
         PHYSICS::Initialize(curField[0], crush_dist[crush_idx]);
-
         PHYSICS::UpdateCollision(curField[0], curField[crush_idx]);
-        PrintPiece(curField[1]);
 
         if (record) {
             recorded_field.push_back(pieces(curField.begin(), curField.end()));
         }
-
 
         while (!CheckAllInactive(curField)) {
             /*
@@ -91,8 +91,6 @@ public:
             // 마찰에 의한 감속 적용하기
             for (auto &p: curField) PHYSICS::UpdateMovement(p, TIME_UNIT);
 
-            //PrintField(curField);
-
             // 모든 쌍에 대해 충돌 판정하기
             for (int i=0; i<field.size(); i++) {
                 for (int j=i+1; j<field.size(); j++) {
@@ -102,7 +100,7 @@ public:
 
             // 경계를 넘어간 말이 있는지 체크
             for (auto &p: curField) {
-                if (p.active == 1 && p.CheckOutOfBounds()) {
+                if (p.active == 1 && CheckOutOfBounds(p)) {
                     switch (p.type) {
                         case 0:
                             answer.point++;

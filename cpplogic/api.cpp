@@ -57,10 +57,6 @@ struct piece { // 바둑알 구조체
     void SetLoc(co _loc) {
         loc = _loc;
     }
-
-    bool CheckOutOfBounds() {
-        return !(0 <= loc.x && loc.x <= SIZE_W && 0 <= loc.y && loc.y <= SIZE_H);
-    }
 };
 
 
