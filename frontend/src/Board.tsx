@@ -1,4 +1,4 @@
-import { useRef, useEffect } from "react";
+import React, { useRef, useEffect } from "react";
 import "./Board.css"
 
 const BOARD_BACKGROUND = "rgb(211, 168, 74)";
@@ -6,13 +6,34 @@ const LINE_COUNT = 19;
 const INNER_MARGIN = 0.05;
 const LINE_THICKNESS = 0.003;
 
-function Board({ width, height, radius, stones }) {
-  const canvasRef = useRef(null);
+type Point = [number, number];
+
+type Stone = {
+  centerX: number,
+  centerY: number,
+  color: string,
+};
+
+type BoardProps = {
+  width: number,
+  height: number,
+  radius: number,
+  stones: Stone[]
+};
+
+const Board: React.FC<BoardProps> = ({ width, height, radius, stones }) => {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
+    if (canvas === null) {
+      return;
+    }
 
     const ctx = canvas.getContext("2d");
+    if (ctx === null) {
+      return;
+    }
     ctx.fillStyle = BOARD_BACKGROUND;
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -54,7 +75,7 @@ function Board({ width, height, radius, stones }) {
     });
   }, [width, height, radius, stones]);
 
-  function drawLine(ctx, from, to, thickness) {
+  function drawLine(ctx: CanvasRenderingContext2D, from: Point, to: Point, thickness: number) {
     ctx.beginPath();
     ctx.lineWidth = thickness;
     ctx.moveTo(...from);
@@ -62,7 +83,7 @@ function Board({ width, height, radius, stones }) {
     ctx.stroke();
   }
 
-  function drawCircle(ctx, x, y, radius, color) {
+  function drawCircle(ctx: CanvasRenderingContext2D, x: number, y: number, radius: number, color: string) {
     ctx.beginPath();
     ctx.arc(x, y, radius, 0, 2*Math.PI);
     ctx.fillStyle = color;

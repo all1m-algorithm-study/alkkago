@@ -1,7 +1,8 @@
 import Board from './Board';
 import './App.css';
+import React from 'react';
 
-function App() {
+const App: React.FC = () => {
   // for demo
   const stones = [
     {
@@ -21,6 +22,6 @@ function App() {
         <Board width={600} height={600} radius={15} stones={stones}></Board>
     </div>
   );
-}
+};
 
 export default App;
