@@ -96,7 +96,7 @@ public:
                 for (int j=i+1; j<field.size(); j++) {
                     piece &p1 = curField[i];
                     piece &p2 = curField[j];
-                    if (p1.dead || p1.dead) continue;
+                    if (p1.dead || p2.dead) continue;
 
                     PHYSICS::UpdateCollision(p1, p2);
                 }
