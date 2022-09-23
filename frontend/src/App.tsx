@@ -1,25 +1,26 @@
 import Board from './Board';
 import './App.css';
-import React from 'react';
+import React, { useState } from 'react';
+import { Point } from './Board';
 
 const App: React.FC = () => {
-  // for demo
-  const stones = [
-    {
-      centerX: 300,
-      centerY: 300,
-      color: "black"
-    },
-    {
-      centerX: 400,
-      centerY: 200,
-      color: "white"
-    }
-  ]
+  const [black, setBlack] = useState<Point>([300, 400]);
+  const [whites, setWhites] = useState<Point[]>([[280, 200], [320, 200]]);
+  const [play, setPlay] = useState(false);
 
   return (
     <div className="app-root">
-        <Board width={600} height={600} radius={15} stones={stones}></Board>
+        <div className="app-center">
+          <Board
+            width={600}
+            height={600}
+            radius={15}
+            black={black}
+            whites={whites}
+            play={play}
+          ></Board>
+          <button onClick={() => setPlay(true)}>Play</button>
+        </div>
     </div>
   );
 };
