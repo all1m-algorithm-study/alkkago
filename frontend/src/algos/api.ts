@@ -5,7 +5,7 @@ export const SIZE_W = 20; // 바둑판의 너비
 export const TIME_UNIT = 1./64.; // 짧은 시간 간격
 export const MIN_VELOCITY   = 1./64.; // 실수 오차를 없앵기 위해 이 값 이하는 절사
 export const MAX_VELOCITY   = 16; // 이분탐색시 적용할 최대 속도
-export const FRICTION_CONST = 1./64.; // 마찰력
+export const FRICTION_CONST = 1./2.; // 마찰력
 
 export const SEARCH_CNT = 360; // 각도를 몇 개의 경우로 분해할 것인지
 export const BS_INTERVAL = 1./64.; // 실수 이분탐색을 몇 번 진행할 것인지
