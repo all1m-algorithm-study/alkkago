@@ -39,7 +39,7 @@ const App: React.FC = () => {
   const [selected, setSelected] = useState<string>("black");
   const [message, setMessage] = useState<string>("보드 위의 돌을 클릭하면 돌이 삭제됩니다.");
   const [editMode, setEditMode] = useState<boolean>(true);
-  const [speed, setSpeed] = useState<number>(4);
+  const [speed, setSpeed] = useState<number>(1);
   const [play, setPlay] = useState<boolean>(true);
 
   function handleClick(p: Point) {
