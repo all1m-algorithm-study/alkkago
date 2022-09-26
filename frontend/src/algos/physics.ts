@@ -16,8 +16,12 @@ export function updateMovement(source: Piece, deltaTime: number) {
     let finalSpeed = initSpeed - FRICTION_CONST * deltaTime;
     
     if (finalSpeed < MIN_VELOCITY) {
+        const deltaLocation = source.vel.getUnitVector().mulScalar(initSpeed * deltaTime);
+        source.loc = source.loc.addVector(deltaLocation);
+
+        source.setVel(new Co(0,0));
         source.active = false;
-        finalSpeed = 0;
+        return;
     }
 
     source.setVel(source.vel.getUnitVector().mulScalar(finalSpeed));
