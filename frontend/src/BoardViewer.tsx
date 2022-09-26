@@ -79,8 +79,10 @@ const BoardViewer: React.FC<BoardViewerProps> = ({ black, whites, speed }) => {
       }
       Painter.drawBoardBase(ctx, BOARD_WIDTH, BOARD_HEIGHT);
       frames[i].forEach(p => {
-        Painter.drawCircle(ctx, p.loc.x, p.loc.y, PIECE_RADIUS,
-          (p.type === 1 ? "black" : "white"));
+        if (p.dead === false) {
+          Painter.drawCircle(ctx, p.loc.x, p.loc.y, PIECE_RADIUS,
+            (p.type === 1 ? "black" : "white"));
+        }
       });
 
       i += speed // n배속
