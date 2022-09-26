@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/alkkago/static/css/main.5636edcb.css",
-    "main.js": "/alkkago/static/js/main.9d06e946.js",
+    "main.js": "/alkkago/static/js/main.d920b2f4.js",
     "static/js/787.f3aeb2a4.chunk.js": "/alkkago/static/js/787.f3aeb2a4.chunk.js",
     "index.html": "/alkkago/index.html",
     "main.5636edcb.css.map": "/alkkago/static/css/main.5636edcb.css.map",
-    "main.9d06e946.js.map": "/alkkago/static/js/main.9d06e946.js.map",
+    "main.d920b2f4.js.map": "/alkkago/static/js/main.d920b2f4.js.map",
     "787.f3aeb2a4.chunk.js.map": "/alkkago/static/js/787.f3aeb2a4.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.5636edcb.css",
-    "static/js/main.9d06e946.js"
+    "static/js/main.d920b2f4.js"
   ]
 }
