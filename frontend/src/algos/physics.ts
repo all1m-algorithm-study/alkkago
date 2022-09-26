@@ -48,13 +48,16 @@ export function checkCollision(source: Piece, target: Piece): boolean {
 export function findCollisionDistance(black: Piece, white: Piece): number {
     const R = white.loc.subVector(black.loc).getNorm();
     const RCos = white.loc.subVector(black.loc).getInnerProduct(black.vel) / black.vel.getNorm();
-    const RCosx = Math.sqrt(R*R - 4*RADIUS*RADIUS);
+    const RCosx = Math.sqrt(R*R - (2*RADIUS-0.001) * (2*RADIUS-0.001));
+    //const RCosx = Math.sqrt(R*R - 4*RADIUS*RADIUS);
 
     if (RCos < RCosx) {
         return INF;
     }
 
-    const determine = 4*RADIUS*RADIUS + RCos*RCos - R*R;
+    //const determine = 4*RADIUS*RADIUS + RCos*RCos - R*R;
+    const determine = (2*RADIUS-0.001) * (2*RADIUS-0.001) + RCos*RCos - R*R;
+
     return determine < 0 ? INF : (RCos - Math.sqrt(determine));
 }
 

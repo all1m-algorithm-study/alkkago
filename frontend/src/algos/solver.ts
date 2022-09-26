@@ -78,7 +78,7 @@ export class Solver {
 
     findOptimal() {
         for (let i = 0; i < SEARCH_CNT; ++i) {
-            const axis = i * (360 / SEARCH_CNT);
+            const axis = ( i / SEARCH_CNT) * 360;
             const unitVec = Physics.getUnitVector(axis);
 
             const result = this.findMaxValNotCrossedOut(MIN_VELOCITY, MAX_VELOCITY, unitVec);
